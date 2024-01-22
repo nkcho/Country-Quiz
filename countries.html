@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Country Quiz</title>
+</head>
+
+<body>
+    <style>
+        .score {
+            text-align: center;
+        }
+        
+        #score {
+            font-size: 5em;
+        }
+        
+        .question {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: beige;
+            padding: 2em
+        }
+        
+        #country {
+            font-size: 3em;
+            text-align: center;
+        }
+        
+        #answers {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            /* border: 2px solid red; */
+            font-size: 1.5em;
+            margin-top: 25px;
+        }
+        
+        #answers .capital {
+            width: 40vw;
+            background-color: black;
+            color: white;
+            margin: 5px;
+            padding: 5px;
+            border-radius: 5px;
+            text-align: center;
+        }
+    </style>
+    <div class="score">
+        <span id="score"></span>pts
+    </div>
+    <div class="question">
+        <p class="">What is the capital of</p>
+        <div id="country"></div>
+    </div>
+    <div id="answers"></div>
+    <div id="data"></div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="countries.json"></script>
+
+    <script>
+        function random(max, min = 0) {
+            return Math.floor(Math.random() * (max - min) + min);
+        }
+
+        function get(str) {
+            return localStorage.getItem(str)
+        }
+
+        function set(str, data) {
+            localStorage.setItem(str, data)
+        }
+
+        function make_mcq(data) {
+            let score = get('score');
+
+
+            $('#score').html(score = score === undefined ? 0 : score)
+
+            const country_id = random(data.length);
+
+            const countries_ = [data[country_id], data[random(data.length)], data[random(data.length)], data[random(data.length)]];
+
+            const capitals = countries_.map(x => x.capital) //.sort();
+
+            $('#country').text(data[country_id].name)
+
+            $('#answers').html(capitals.sort().map(x => `<div class="capital" >${x}</div>`).sort().join(''));
+
+            $('.capital').on('click', function(e) {
+
+                const country = $('#country').text()
+                const answer = $(this).text();
+
+                const capital = countries.filter(x => x.name == country)[0].capital
+
+                if (capital == answer) {
+                    // alert(`You got it: ${answer}!`);
+                    score_mgt('add');
+                    init();
+                    return
+                }
+                score_mgt('deduct');
+            });
+        }
+
+        function score_mgt(param) {
+            let score = get('score');
+
+            if (score === undefined) {
+                score = 0;
+            }
+
+            if (param == 'add') {
+                console.log({
+                    score
+                })
+                set('score', ++score)
+            } else {
+                console.log({
+                    score
+                })
+                set('score', --score)
+
+            }
+
+        }
+
+        function init() {
+            const country_data = [];
+            countries.map(x => {
+                if (x.region != 'AF') return;
+                country_data.push(x);
+            });
+            make_mcq(country_data);
+        }
+
+        init();
+    </script>
+</body>
+
+</html>
